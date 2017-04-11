@@ -36,7 +36,7 @@ public class Localization {
 	
 	public static String getText(String value){
 		for(TextDef t:texts) if(t.getValue().equals(value)) return t.getText();
-		return "<"+value+">";
+		return "*"+value+"*";
 	}
 	
 	public static void setLocalizationPath(String path){
