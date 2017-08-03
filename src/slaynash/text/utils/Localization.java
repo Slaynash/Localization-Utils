@@ -6,19 +6,26 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Localization {
-	private static List<TextDef> texts = new ArrayList<TextDef>();
-	private static String localizationPath;
-
+	private static Map<String, ArrayList<TranslationDef>> translations = new HashMap<String, ArrayList<TranslationDef>>();
+	private static String currentLang = "en";
+	
 	public static void setLang(String lang){
-		File locFile;
-		if(lang.toLowerCase().split("_",2)[0].equals("fr")){
-			locFile = new File(localizationPath+"/fr.hgf");
-		}
-		else{
-			locFile = new File(localizationPath+"/en.hgf");
+		currentLang = lang.toLowerCase();
+	}
+
+	public static void loadLangFile(String lang, String path){
+		File locFile = new File(path);
+		if(!locFile.exists()) return;
+		
+		ArrayList<TranslationDef> langtranslations;
+		
+		if((langtranslations = translations.get(lang)) == null) {
+			langtranslations = new ArrayList<TranslationDef>();
+			translations.put(lang, langtranslations);
 		}
 		
 		try {
@@ -26,7 +33,7 @@ public class Localization {
 			String line;
 			while((line = br.readLine()) != null){
 				String[] v = line.split("=", 2);
-				texts.add(new TextDef(v[0], v[1]));
+				langtranslations.add(new TranslationDef(v[0], v[1]));
 			}
 			br.close();
 		}
@@ -34,12 +41,24 @@ public class Localization {
 		catch (IOException e) {e.printStackTrace();}
 	}
 	
-	public static String getText(String value){
-		for(TextDef t:texts) if(t.getValue().equals(value)) return t.getText();
+	public static String getTranslation(String value){
+		if(translations.get(currentLang) != null) for(TranslationDef t:translations.get(currentLang)) if(t.getValue().equals(value)) return t.getText();
+		if(translations.get("en") != null) for(TranslationDef t:translations.get(currentLang)) if(t.getValue().equals(value)) return t.getText();
 		return "*"+value+"*";
 	}
 	
-	public static void setLocalizationPath(String path){
-		localizationPath = path;
+	public static String getTranslation(String lang, String value){
+		if(translations.get(lang) != null) for(TranslationDef t:translations.get(currentLang)) if(t.getValue().equals(value)) return t.getText();
+		if(translations.get("en") != null) for(TranslationDef t:translations.get(currentLang)) if(t.getValue().equals(value)) return t.getText();
+		return "*"+value+"*";
+	}
+	
+	public static void registerTranslation(String lang, String key, String translation) {
+		ArrayList<TranslationDef> langtranslations;
+		if((langtranslations = translations.get(lang)) == null) {
+			langtranslations = new ArrayList<TranslationDef>();
+			translations.put(lang, langtranslations);
+		}
+		langtranslations.add(new TranslationDef(key, translation));
 	}
 }
