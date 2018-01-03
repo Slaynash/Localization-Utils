@@ -43,7 +43,7 @@ public class Localization {
 	
 	public static String getTranslation(String value){
 		if(translations.get(currentLang) != null) for(TranslationDef t:translations.get(currentLang)) if(t.getValue().equals(value)) return t.getText();
-		if(translations.get("en") != null) for(TranslationDef t:translations.get(currentLang)) if(t.getValue().equals(value)) return t.getText();
+		if(translations.get("en") != null) for(TranslationDef t:translations.get("en")) if(t.getValue().equals(value)) return t.getText();
 		return "*"+value+"*";
 	}
 	
